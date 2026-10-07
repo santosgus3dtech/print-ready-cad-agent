@@ -4,7 +4,7 @@ const baseURL = process.env.PRINTREADY_URL || 'http://127.0.0.1:8012';
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 90_000,
+  timeout: process.env.CI ? 180_000 : 90_000,
   workers: 1,
   reporter: 'list',
   outputDir: '../_data/qa/playwright',

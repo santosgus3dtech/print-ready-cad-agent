@@ -113,6 +113,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run pytest
 uv run python -m printready.evaluate
+npm --prefix frontend run format:check
 npm --prefix frontend run build
 npx --prefix frontend playwright install chromium
 npm --prefix frontend run test:e2e

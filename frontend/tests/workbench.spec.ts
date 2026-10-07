@@ -3,8 +3,11 @@ import { PNG } from 'pngjs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
-const screenshots = path.resolve(process.env.PRINTREADY_CAPTURE_PORTFOLIO === '1'
-  ? '../docs/screenshots' : '../_data/qa/screenshots');
+const screenshots = path.resolve(
+  process.env.PRINTREADY_CAPTURE_PORTFOLIO === '1'
+    ? '../docs/screenshots'
+    : '../_data/qa/screenshots',
+);
 
 async function modelReady(page: Page) {
   await expect(page.locator('canvas')).toHaveAttribute('data-loaded', 'true');
@@ -12,41 +15,59 @@ async function modelReady(page: Page) {
 }
 
 async function generate(page: Page) {
-  const response = page.waitForResponse(r => r.url().endsWith('/api/jobs') && r.request().method() === 'POST');
+  const response = page.waitForResponse(
+    (r) => r.url().endsWith('/api/jobs') && r.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: 'Generate model', exact: true }).click();
   const result = await response;
   expect(result.status()).toBe(201);
   const job = await result.json();
-  await expect(page.locator('canvas')).toHaveAttribute('data-model-source', job.artifacts['preview.glb'].url);
+  await expect(page.locator('canvas')).toHaveAttribute(
+    'data-model-source',
+    job.artifacts['preview.glb'].url,
+  );
   await modelReady(page);
 }
 
 function geometryPixels(buffer: Buffer) {
   const image = PNG.sync.read(buffer);
-  let count = 0, minX = image.width, minY = image.height, maxX = 0, maxY = 0;
+  let count = 0,
+    minX = image.width,
+    minY = image.height,
+    maxX = 0,
+    maxY = 0;
   for (let y = 0; y < image.height; y++) {
     for (let x = 0; x < image.width; x++) {
       const index = (y * image.width + x) * 4;
       const [r, g, b] = image.data.subarray(index, index + 3);
       if (r < 160 && g > r * 1.14 && b > r * 1.14 && g > 65) {
-        count++; minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+        count++;
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
       }
     }
   }
-  expect(count / (image.width * image.height)).toBeGreaterThan(.01);
-  expect(minX).toBeGreaterThan(2); expect(minY).toBeGreaterThan(2);
-  expect(maxX).toBeLessThan(image.width - 2); expect(maxY).toBeLessThan(image.height - 2);
+  expect(count / (image.width * image.height)).toBeGreaterThan(0.01);
+  expect(minX).toBeGreaterThan(2);
+  expect(minY).toBeGreaterThan(2);
+  expect(maxX).toBeLessThan(image.width - 2);
+  expect(maxY).toBeLessThan(image.height - 2);
 }
 
 test('generate, validate, inspect evidence, export and restore history', async ({ page }) => {
   const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => {
-    const screenshotDriverWarning = message.type() === 'warning'
-      && /^\[\.WebGL-.*GL Driver Message .*GPU stall due to ReadPixels/.test(message.text());
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    const screenshotDriverWarning =
+      message.type() === 'warning' &&
+      /^\[\.WebGL-.*GL Driver Message .*GPU stall due to ReadPixels/.test(message.text());
     if (screenshotDriverWarning) {
-      test.info().annotations.push({ type: 'capture-driver-warning', description: 'Chromium screenshot ReadPixels stall; not an application error.' });
+      test.info().annotations.push({
+        type: 'capture-driver-warning',
+        description: 'Chromium screenshot ReadPixels stall; not an application error.',
+      });
     } else if (['error', 'warning'].includes(message.type())) errors.push(message.text());
   });
   await page.goto('/');
@@ -89,12 +110,17 @@ test('generate, validate, inspect evidence, export and restore history', async (
 
   await page.getByRole('tab', { name: 'History', exact: true }).click();
   await page.locator('.history-row').filter({ hasText: 'Electronics enclosure' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Electronics enclosure', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Electronics enclosure', exact: true }),
+  ).toBeVisible();
   await page.getByRole('tab', { name: 'Validation', exact: true }).click();
   await modelReady(page);
 
   await page.getByRole('button', { name: 'Wireframe', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Wireframe', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Wireframe', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await page.getByRole('button', { name: 'Wireframe', exact: true }).click();
   const before = await page.locator('canvas').screenshot();
   await page.getByRole('button', { name: 'Auto rotate', exact: true }).click();
@@ -106,18 +132,29 @@ test('generate, validate, inspect evidence, export and restore history', async (
 
   await mkdir(screenshots, { recursive: true });
   await page.screenshot({ path: path.join(screenshots, 'workbench-desktop.png') });
-  for (const [width, height] of [[1024, 768], [390, 844]]) {
+  for (const [width, height] of [
+    [1024, 768],
+    [390, 844],
+  ]) {
     await page.setViewportSize({ width, height });
     await page.getByRole('button', { name: 'Fit view', exact: true }).click();
     geometryPixels(await page.locator('canvas').screenshot());
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
     await expect(page.getByRole('button', { name: 'Generate model', exact: true })).toBeVisible();
-    if (width === 390) await page.screenshot({ path: path.join(screenshots, 'workbench-mobile.png'), fullPage: true });
+    if (width === 390)
+      await page.screenshot({
+        path: path.join(screenshots, 'workbench-mobile.png'),
+        fullPage: true,
+      });
   }
   expect(errors).toEqual([]);
 });
 
-test('invalid dimensions show an actionable error without replacing the model', async ({ page }) => {
+test('invalid dimensions show an actionable error without replacing the model', async ({
+  page,
+}) => {
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Generate model', exact: true })).toBeEnabled();
   await page.getByRole('tab', { name: 'Enclosure', exact: true }).click();
