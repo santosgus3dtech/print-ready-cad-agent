@@ -1,11 +1,13 @@
+from dotenv import load_dotenv
 from mcp.server.mcpserver import MCPServer
 
 from .knowledge import DOCUMENTS, search_knowledge
 from .models import PROFILES, BriefRequest, DesignSpec
 from .planner import plan_brief
 from .service import generate_part as build
-from .store import get_job, recent_jobs
+from .store import ROOT, get_job, recent_jobs
 
+load_dotenv(ROOT / ".env", override=False)
 mcp = MCPServer("PrintReady CAD Agent")
 
 
