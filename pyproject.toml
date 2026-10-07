@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "print-ready-cad-agent"
+version = "0.1.0"
+description = "Local parametric CAD, grounded design tools and inspectable print preparation over MCP."
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "cadquery>=2.6,<3",
+  "fastapi>=0.116,<1",
+  "mcp>=2.2,<3",
+  "pydantic>=2.11,<3",
+  "python-dotenv>=1.1,<2",
+  "rank-bm25>=0.2.2,<1",
+  "trimesh>=4.9,<5",
+  "uvicorn>=0.35,<1",
+]
+
+[project.optional-dependencies]
+dev = ["httpx>=0.28,<1", "pytest>=8.4,<10", "ruff>=0.12,<1", "pytest-asyncio>=1,<2"]
+
+[project.scripts]
+printready-api = "printready.api:main"
+printready-mcp = "printready.mcp_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/printready"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

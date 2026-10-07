@@ -1,0 +1,7 @@
+{"query":"electronics enclosure screw bosses","expected":"enclosure-design"}
+{"query":"adapter bore flange","expected":"adapter-design"}
+{"query":"bracket mounting orientation","expected":"bracket-design"}
+{"query":"slicer profile time filament","expected":"slicer-evidence"}
+{"query":"clearance folga encaixe","expected":"fit-clearance"}
+{"query":"wall nozzle thickness","expected":"wall-features"}
+{"query":"physical printing approval hash telemetry","expected":"physical-approval"}
