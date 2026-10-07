@@ -3,7 +3,8 @@ import { PNG } from 'pngjs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
-const screenshots = path.resolve('../docs/screenshots');
+const screenshots = path.resolve(process.env.PRINTREADY_CAPTURE_PORTFOLIO === '1'
+  ? '../docs/screenshots' : '../_data/qa/screenshots');
 
 async function modelReady(page: Page) {
   await expect(page.locator('canvas')).toHaveAttribute('data-loaded', 'true');

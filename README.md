@@ -123,6 +123,8 @@ exercise printer-envelope failures. API tests cover generation, downloads, origi
 profile separation. MCP tests verify the typed tool contract and a real stdio client session.
 Playwright exercises generation, evidence, history, downloads, invalid inputs and viewport tools.
 Canvas-pixel checks verify nonblank geometry, framing and movement at desktop and mobile sizes.
+Test captures normally go to ignored `_data/qa/`. Set `PRINTREADY_CAPTURE_PORTFOLIO=1` when
+deliberately regenerating the tracked portfolio screenshots.
 
 The seven-query illustrative retrieval set currently scores Recall@3 1.0 and MRR@3 1.0; this is
 a smoke evaluation, not evidence of real-world generalization. Real local A1 slicing was also
