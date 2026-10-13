@@ -1,5 +1,7 @@
 # PrintReady CAD Agent
 
+🇧🇷 [Leia este README em Português (Brasil)](README.pt-BR.md).
+
 [![CI](https://github.com/santosgus3dtech/print-ready-cad-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/santosgus3dtech/print-ready-cad-agent/actions/workflows/ci.yml)
 
 A local, inspectable workflow from a measured design brief to parametric CAD, geometry checks and
