@@ -13,3 +13,5 @@ frontend/dist/
 *.log
 .DS_Store
 Thumbs.db
+/docs/.obsidian/
+/docs/.trash/
